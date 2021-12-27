@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    
+    <title>DOGS</title>
+    <link href="dogs.css" rel="stylesheet" />
+</head>
+
+<body>
+<header class = "myHeader">
+    <div>
+        <h2>Doggypedia</h2>
+    </div>
+</header>
+<div class="my-container-outer">
+
+<input type="text" id="myInput" onkeyup="search()" placeholder="Search for a dog by name">
+
+
+</div>
+<div id = "app">
+<table class="content-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Orgin</th>
+            <th>Attitude</th>
+            <th>Height</th>
+            <th>Weight</th>
+            <th>life Span</th>
+        </tr>
+    </thead>
+    
+</table>
+</div>
+</div>
+<script type="text/javascript">
+    fetch("https://api.thedogapi.com/v1/breeds").
+        then(response => response.json()).
+        then(theResponse => { console.log("the response:", theResponse);
+                document.getElementById("app").innerHTML = `
+           <table class="content-table" id = "myTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">ID</th>
+                        <th onclick="sortTable(1)">Name</th>
+                        <th>Bred For</th>
+                        <th>Attitude</th>
+                        <th>Height</th>
+                        <th>Weight</th>
+                        <th>life Span</th>
+                    </tr>
+                </thead>
+                <tbody id = "players-body">
+            `;
+
+         theResponse.forEach(dog => {
+                document.getElementById("players-body").innerHTML += `
+                    <tr>
+                        <td>${dog.id}</td>
+                        <td>${dog.name}</td>
+                        <td>${dog.bred_for}</td>
+                        <td>${dog.temperament}</td>
+                        <td>${dog.height.imperial} inches</td>
+                        <td>${dog.weight.imperial} pounds</td>
+                        <td>${dog.life_span}</td>
+                        
+                `
+            });
+})
+
+//search function 
+    function search() {
+        // Declare variables
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("players-body");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    //table sorting
+    function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("myTable");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                     
+                    if (dir == "asc") {
+                        if (Number(x.innerHTML) > Number(y.innerHTML)) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (Number(x.innerHTML) < Number(y.innerHTML)) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+
+    </script>
+
+</script>
+</body>
+
+</html>
